@@ -12,10 +12,10 @@ import { SiteFooter } from "./SiteFooter";
 import { StickyBanner } from "./StickyBanner";
 
 function buildDefaultOpen(categories: Category[]): Record<string, boolean> {
+  // 모든 카테고리를 기본 펼침 상태로 시작한다.
   const map: Record<string, boolean> = {};
-  // README: 기본값은 "마지막 섹션만 접힌 상태"
-  categories.forEach((c, i) => {
-    map[c.id] = i !== categories.length - 1;
+  categories.forEach((c) => {
+    map[c.id] = true;
   });
   return map;
 }

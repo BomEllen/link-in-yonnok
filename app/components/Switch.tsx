@@ -18,13 +18,13 @@ export function Switch({
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
       className={cx(
-        "relative h-6 w-10 shrink-0 rounded-full transition-colors",
+        "relative h-6 w-10 shrink-0 rounded-full border-0 p-0 transition-colors",
         checked ? "bg-brand" : "bg-brand/[22%]"
       )}
     >
       <span
         className={cx(
-          "absolute top-1/2 h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white shadow-knob transition-transform",
+          "absolute left-0 top-1/2 h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white shadow-knob transition-transform",
           checked ? "translate-x-[19px]" : "translate-x-[3px]"
         )}
       />

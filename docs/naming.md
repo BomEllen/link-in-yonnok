@@ -41,7 +41,9 @@
 > 플레이스홀더만 보여주고, 값이 있으면 실제 이미지를 렌더링한다(5단계에서 업로드 붙기 전까지는 항상 빈 값).
 
 ## 정렬/조회 규칙 (프롬프트 지시, README 외 추가)
-- 정렬은 항상 `order_index ASC`.
+- 정렬은 항상 `order_index ASC`. `order_index`가 같은 행이 있을 수 있으므로(드래그
+  정렬 중 임시로 겹치는 경우 등) tiebreaker를 둔다 — Category는 `(order_index, id)`,
+  Link는 `(order_index, created_at)` 순.
 - `Category.hidden = true`→ 공개 메인에서 해당 섹션 통째로 미노출.
 - `Link.category_id IS NULL`→ 공개 메인 미노출, 관리 화면 전용.
 - `Profile`은 테이블에 항상 행 1개만 존재.

@@ -13,8 +13,17 @@ export async function getPublicPageData(): Promise<{
 
   const [profileRes, categoriesRes, linksRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", 1).single(),
-    supabase.from("categories").select("*").order("order_index", { ascending: true }),
-    supabase.from("links").select("*").order("order_index", { ascending: true }),
+    // order_index가 겹칠 수 있으므로 tiebreaker를 둔다 (드래그 정렬 시 순서가 흔들리지 않도록).
+    supabase
+      .from("categories")
+      .select("*")
+      .order("order_index", { ascending: true })
+      .order("id", { ascending: true }),
+    supabase
+      .from("links")
+      .select("*")
+      .order("order_index", { ascending: true })
+      .order("created_at", { ascending: true }),
   ]);
 
   if (profileRes.error) throw profileRes.error;

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EDE7DF;font-family:"Noto Sans KR",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#775537}a:hover{color:#5B3F28}
+input,button,textarea{font-family:inherit}
+input:focus{outline:none}
+.ph::-webkit-scrollbar{width:0}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style></helmet>
+
+<div style="display:flex;flex-wrap:wrap;gap:56px;padding:52px 56px 80px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;align-items:baseline;gap:9px">
+    <span style="font:600 10px ui-monospace,Menlo,monospace;background:#775537;color:#FBE29D;padding:4px 8px;border-radius:5px">01</span>
+    <span style="font:500 13px 'Noto Sans KR',sans-serif;color:#4A3520">메인 페이지 · 방문자가 보는 화면</span>
+    <span style="font:400 11px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5)">375 × 812</span>
+  </div>
+
+  <div data-screen-label="01 Main" style="width:375px;height:812px;background:#FDFBF7;border-radius:34px;box-shadow:0 18px 44px rgba(93,66,39,.16),0 2px 6px rgba(93,66,39,.08);overflow:hidden;position:relative">
+    <div class="ph" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden">
+
+      <sc-if value="{{ bannerOn }}" hint-placeholder-val="{{ true }}">
+      <div style="position:sticky;top:0;z-index:30;background:#775537;padding:9px 18px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <span style="width:5px;height:5px;border-radius:50%;background:#FBE29D;flex:none"></span><div style="box-sizing: border-box; display: flex; flex-direction: column; gap: 12px"><span style="font: 300 10.5px/1.4 'Noto Sans KR',sans-serif; color: #FFFFFF; letter-spacing: -.2px; text-align: center; font-size: 11px">제휴 링크를 통한 판매 발생시 소정의 수수료를 제공받습니다.</span></div>
+      </div>
+      </sc-if>
+
+      <div style="padding:26px 24px 0;position:relative">
+        <div style="position:absolute;top:-40px;right:-60px;width:180px;height:180px;border-radius:50%;background:#C0DDDA;opacity:.35;filter:blur(2px)"></div>
+        <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between">
+          <div style="width:78px;height:78px;border-radius:50%;background:repeating-linear-gradient(135deg,#E4D9C8 0 6px,#F1F1F1 6px 12px);border:1px solid rgba(119,85,55,.18);display:flex;align-items:center;justify-content:center">
+            <span style="font:400 8px ui-monospace,Menlo,monospace;color:#8A7358;letter-spacing:-.3px">profile</span>
+          </div>
+          <div style="display:flex;gap:8px;padding-top:6px">
+            <button onClick="{{ openShare }}" title="공유" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(119,85,55,.2);background:#fff;color:#775537;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(119,85,55,.08)">↗</button>
+            <button style="height:38px;padding:0 16px;border-radius:19px;border:none;background:#775537;color:#FBE29D;font:500 12.5px 'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 3px 10px rgba(119,85,55,.28)">비즈니스 제안</button>
+          </div>
+        </div>
+
+        <div style="position:relative;margin-top:16px">
+          <div style="font:400 25px/1.25 'Gowun Batang',serif;color:#4A3520;letter-spacing:-.4px">{{ nick }}</div>
+          <div style="font:300 12.5px/1.65 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.66);margin-top:7px">{{ bio }}</div>
+        </div>
+
+        <div style="position:relative;margin-top:18px;display:flex;align-items:center;gap:9px;height:46px;padding:0 16px;border-radius:23px;background:#F1F1F1;border:1px solid rgba(119,85,55,.1)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A0906F" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+          <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="상품 · 링크 제목 검색" style="flex:1;border:none;background:transparent;font:300 13px 'Noto Sans KR',sans-serif;color:#4A3520">
+          <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearQuery }}" style="border:none;background:rgba(119,85,55,.12);color:#775537;width:20px;height:20px;border-radius:50%;font-size:11px;line-height:1;cursor:pointer;flex:none">✕</button>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="padding:20px 24px 0;display:flex;justify-content:flex-end">
+        <div style="display:flex;gap:2px;padding:3px;border-radius:12px;background:#F1F1F1;border:1px solid rgba(119,85,55,.1)">
+          <button onClick="{{ set2 }}" title="2열 보기" style="width:30px;height:24px;border:none;border-radius:9px;background:{{ bg2 }};cursor:pointer;display:flex;align-items:center;justify-content:center;gap:2px">
+            <span style="width:6px;height:11px;border-radius:1.5px;background:{{ dot2 }}"></span>
+            <span style="width:6px;height:11px;border-radius:1.5px;background:{{ dot2 }}"></span>
+          </button>
+          <button onClick="{{ set3 }}" title="3열 보기" style="width:34px;height:24px;border:none;border-radius:9px;background:{{ bg3 }};cursor:pointer;display:flex;align-items:center;justify-content:center;gap:2px">
+            <span style="width:4.5px;height:11px;border-radius:1.5px;background:{{ dot3 }}"></span>
+            <span style="width:4.5px;height:11px;border-radius:1.5px;background:{{ dot3 }}"></span>
+            <span style="width:4.5px;height:11px;border-radius:1.5px;background:{{ dot3 }}"></span>
+          </button>
+        </div>
+      </div>
+
+      <div style="padding:14px 24px 0;display:flex;flex-direction:column;gap:22px">
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+          <div>
+            <button onClick="{{ sec.toggle }}" style="width:100%;display:flex;align-items:center;gap:8px;padding:0 0 12px;border:none;background:transparent;cursor:pointer;text-align:left">
+              <span style="font:400 17.5px 'Gowun Batang',serif;color:#4A3520">{{ sec.title }}</span>
+              <span style="font:400 10.5px ui-monospace,Menlo,monospace;color:#775537;background:#FBE29D;padding:2px 6px;border-radius:9px">{{ sec.count }}</span>
+              <span style="flex:1"></span>
+              <span style="font-size:11px;color:rgba(74,53,32,.45)">{{ sec.caret }}</span>
+            </button>
+
+            <sc-if value="{{ sec.openGrid }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:{{ cols }};gap:{{ gap }};animation:fadeIn .22s ease">
+                <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="4">
+                  <div style="background:#fff;border-radius:{{ radius }};overflow:hidden;box-shadow:0 2px 10px rgba(119,85,55,.09);cursor:pointer;border:1px solid rgba(119,85,55,.06);aspect-ratio:3/4;display:flex;flex-direction:column">
+                    <div style="flex:1;min-height:0;background:repeating-linear-gradient(135deg,#E7DCCB 0 7px,#F4EFE6 7px 14px);display:flex;align-items:flex-end;padding:7px">
+                      <span style="font:400 8px ui-monospace,Menlo,monospace;color:#8A7358;background:rgba(255,255,255,.75);padding:2px 5px;border-radius:4px">{{ it.tag }}</span>
+                    </div>
+                    <div style="padding:{{ pad }};flex:none;height:{{ capH }};box-sizing:border-box">
+                      <div style="font:400 {{ tSize }}/1.55 'Noto Sans KR',sans-serif;color:#4A3520;height:{{ lineH }};display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:34px 0 10px">
+            <div style="font:400 14px 'Gowun Batang',serif;color:#4A3520">검색 결과가 없어요</div>
+            <div style="font:300 11.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5);margin-top:6px">다른 이름으로 찾아보세요</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="padding:38px 24px 40px;text-align:center">
+        <div style="width:26px;height:1px;background:rgba(119,85,55,.25);margin:0 auto 14px"></div>
+        <div style="font:300 10.5px/1.7 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.45)">이 링크는 연녹이 직접 관리합니다<br>© 2026 yeonnok.link</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ shareOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeShare }}" style="position:absolute;inset:0;z-index:40;background:rgba(53,37,22,.42);animation:fadeIn .18s ease;display:flex;align-items:flex-end">
+        <div style="width:100%;background:#FDFBF7;border-radius:26px 26px 0 0;padding:10px 20px 26px;animation:sheetUp .26s cubic-bezier(.22,.9,.25,1)">
+          <div style="width:38px;height:4px;border-radius:2px;background:rgba(119,85,55,.2);margin:0 auto 16px"></div>
+          <div style="font:400 15px 'Gowun Batang',serif;color:#4A3520;margin-bottom:16px">페이지 공유</div>
+          <div style="display:flex;gap:12px;margin-bottom:18px">
+            <sc-for list="{{ shareTargets }}" as="s" hint-placeholder-count="4">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
+                <div style="width:100%;aspect-ratio:1;border-radius:16px;background:#F1F1F1;border:1px solid rgba(119,85,55,.1);display:flex;align-items:center;justify-content:center;font-size:16px;color:#775537">{{ s.icon }}</div>
+                <span style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.6)">{{ s.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#F1F1F1;border-radius:14px;padding:12px 14px">
+            <span style="flex:1;font:400 11.5px ui-monospace,Menlo,monospace;color:rgba(74,53,32,.6);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">seoyeon.link/me</span>
+            <button style="border:none;background:#775537;color:#FBE29D;border-radius:10px;padding:7px 12px;font:500 11px 'Noto Sans KR',sans-serif;cursor:pointer">복사</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;align-items:baseline;gap:9px">
+    <span style="font:600 10px ui-monospace,Menlo,monospace;background:#775537;color:#FBE29D;padding:4px 8px;border-radius:5px">02</span>
+    <span style="font:500 13px 'Noto Sans KR',sans-serif;color:#4A3520">등록 화면 · 관리자 전용</span>
+    <span style="font:400 11px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5)">스크롤 없이 3단계</span>
+  </div>
+
+  <div data-screen-label="02 Register" style="width:375px;height:812px;background:#FDFBF7;border-radius:34px;box-shadow:0 18px 44px rgba(93,66,39,.16),0 2px 6px rgba(93,66,39,.08);overflow:hidden;position:relative;display:flex;flex-direction:column">
+
+    <div style="padding:22px 22px 14px;display:flex;align-items:center;gap:12px">
+      <button style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(119,85,55,.16);background:#fff;color:#775537;font-size:14px;cursor:pointer">←</button>
+      <div style="flex:1">
+        <div style="font:400 19px 'Gowun Batang',serif;color:#4A3520">새 링크 등록</div>
+        <div style="font:300 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5);margin-top:3px">사진 · 제목 · 링크만 있으면 끝</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <span style="width:16px;height:3px;border-radius:2px;background:{{ step1 }}"></span>
+        <span style="width:16px;height:3px;border-radius:2px;background:{{ step2 }}"></span>
+        <span style="width:16px;height:3px;border-radius:2px;background:{{ step3 }}"></span>
+      </div>
+    </div>
+
+    <div style="flex:1;padding:0 22px;display:flex;flex-direction:column;gap:16px">
+
+      <sc-if value="{{ noPhoto }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ addPhoto }}" style="width:100%;aspect-ratio:1;border-radius:24px;border:1.5px dashed rgba(119,85,55,.35);background:#F6F1E8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer">
+          <span style="width:50px;height:50px;border-radius:50%;background:#FBE29D;color:#775537;font:300 26px/1 'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(119,85,55,.16)">+</span>
+          <span style="font:400 14px 'Gowun Batang',serif;color:#4A3520">사진 추가</span>
+          <span style="font:300 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.45)">탭해서 앨범에서 선택 · 1:1 권장</span>
+        </button>
+      </sc-if>
+
+      <sc-if value="{{ hasPhoto }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:repeating-linear-gradient(135deg,#E7DCCB 0 9px,#F4EFE6 9px 18px);animation:fadeIn .2s ease;box-shadow:0 3px 12px rgba(119,85,55,.1)">
+          <span style="position:absolute;left:12px;bottom:12px;font:400 9px ui-monospace,Menlo,monospace;color:#8A7358;background:rgba(255,255,255,.8);padding:4px 7px;border-radius:5px">thumbnail 1:1</span>
+          <button onClick="{{ removePhoto }}" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(53,37,22,.55);color:#fff;font-size:12px;cursor:pointer">✕</button>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <span style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px">제목</span>
+        <input value="{{ title }}" onChange="{{ onTitle }}" placeholder="상품명을 입력하세요" style="height:52px;border-radius:16px;border:1px solid rgba(119,85,55,.14);background:#fff;padding:0 16px;font:400 14px 'Noto Sans KR',sans-serif;color:#4A3520;box-shadow:0 1px 4px rgba(119,85,55,.05)">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <span style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px">링크</span>
+        <div style="display:flex;align-items:center;gap:8px;height:52px;border-radius:16px;border:1px solid rgba(119,85,55,.14);background:#fff;padding:0 8px 0 16px;box-shadow:0 1px 4px rgba(119,85,55,.05)">
+          <input value="{{ url }}" onChange="{{ onUrl }}" placeholder="링크를 붙여넣으세요" style="flex:1;min-width:0;border:none;background:transparent;font:400 13.5px 'Noto Sans KR',sans-serif;color:#4A3520">
+          <button onClick="{{ paste }}" style="flex:none;height:36px;padding:0 13px;border-radius:12px;border:none;background:#C0DDDA;color:#3E5B58;font:500 11.5px 'Noto Sans KR',sans-serif;cursor:pointer">붙여넣기</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px">카테고리</span>
+          <span style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.35)">선택</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+            <button onClick="{{ c.pick }}" style="height:36px;padding:0 15px;border-radius:18px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};font:400 12.5px 'Noto Sans KR',sans-serif;cursor:pointer">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:16px 22px 26px;background:linear-gradient(to top,#FDFBF7 60%,rgba(253,251,247,0))">
+      <button onClick="{{ submit }}" style="width:100%;height:56px;border-radius:20px;border:none;background:{{ btnBg }};color:{{ btnFg }};font:500 15px 'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(119,85,55,.2)">{{ btnLabel }}</button>
+      <div style="text-align:center;font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.4);margin-top:11px">등록하면 메인 페이지 맨 위에 추가됩니다</div>
+    </div>
+
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:22px;right:22px;bottom:98px;background:#4A3520;color:#FBE29D;border-radius:16px;padding:14px 16px;font:400 12.5px 'Noto Sans KR',sans-serif;display:flex;align-items:center;gap:9px;animation:toastIn .22s ease;box-shadow:0 8px 24px rgba(53,37,22,.28)">
+        <span style="font-size:13px">✓</span>
+        <span style="flex:1">등록 완료 · 메인 페이지에 추가했어요</span>
+      </div>
+    </sc-if>
+  </div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+  <div style="display:flex;align-items:baseline;gap:9px">
+    <span style="font:600 10px ui-monospace,Menlo,monospace;background:#775537;color:#FBE29D;padding:4px 8px;border-radius:5px">03</span>
+    <span style="font:500 13px 'Noto Sans KR',sans-serif;color:#4A3520">메인 페이지 관리 · 관리자 전용</span>
+    <span style="font:400 11px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5)">프로필 · 카테고리 · 순서</span>
+  </div>
+
+  <div data-screen-label="03 Manage" style="width:375px;height:812px;background:#FDFBF7;border-radius:34px;box-shadow:0 18px 44px rgba(93,66,39,.16),0 2px 6px rgba(93,66,39,.08);overflow:hidden;position:relative;display:flex;flex-direction:column">
+
+    <div style="padding:22px 22px 12px;display:flex;align-items:center;gap:12px;flex:none">
+      <div style="flex:1">
+        <div style="font:400 19px 'Gowun Batang',serif;color:#4A3520">페이지 관리</div>
+        <div style="font:300 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5);margin-top:3px">변경 사항은 바로 메인에 반영됩니다</div>
+      </div>
+      <button style="height:32px;padding:0 13px;border-radius:16px;border:1px solid rgba(119,85,55,.2);background:#fff;color:#775537;font:500 11.5px 'Noto Sans KR',sans-serif;cursor:pointer">미리보기</button>
+    </div>
+
+    <div class="ph" style="flex:1;overflow-y:auto;padding:0 22px 20px;display:flex;flex-direction:column;gap:22px">
+
+      <div>
+        <div style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px;margin-bottom:10px">프로필</div>
+        <div style="background:#fff;border:1px solid rgba(119,85,55,.08);border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(119,85,55,.06)">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="position:relative;flex:none">
+              <div style="width:62px;height:62px;border-radius:50%;background:repeating-linear-gradient(135deg,#E4D9C8 0 6px,#F1F1F1 6px 12px);border:1px solid rgba(119,85,55,.16)"></div>
+              <span style="position:absolute;right:-3px;bottom:-3px;width:24px;height:24px;border-radius:50%;background:#FBE29D;color:#775537;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px">✎</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+              <button style="height:32px;border-radius:16px;border:none;background:#775537;color:#FBE29D;font:500 11.5px 'Noto Sans KR',sans-serif;cursor:pointer">사진 변경</button>
+              <button style="height:30px;border-radius:15px;border:1px solid rgba(119,85,55,.16);background:#fff;color:rgba(74,53,32,.6);font:400 11px 'Noto Sans KR',sans-serif;cursor:pointer">기본 이미지로</button>
+            </div>
+          </div>
+          <div style="height:1px;background:rgba(119,85,55,.08);margin:15px 0"></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5)">닉네임</span>
+              <input value="{{ nick }}" onChange="{{ onNick }}" style="height:44px;border-radius:14px;border:1px solid rgba(119,85,55,.14);background:#FDFBF7;padding:0 14px;font:400 13.5px 'Noto Sans KR',sans-serif;color:#4A3520"></input>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.5)">한 줄 소개</span>
+              <input value="{{ bio }}" onChange="{{ onBio }}" style="height:44px;border-radius:14px;border:1px solid rgba(119,85,55,.14);background:#FDFBF7;padding:0 14px;font:300 12.5px 'Noto Sans KR',sans-serif;color:#4A3520"></input>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:10px">
+          <span style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px">카테고리</span>
+          <span style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.35)">끌어서 순서 변경 · 눈 아이콘으로 숨기기</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ adminCats }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:11px;background:#fff;border:1px solid rgba(119,85,55,.08);border-radius:18px;padding:12px 13px;box-shadow:0 2px 8px rgba(119,85,55,.06);opacity:{{ c.opacity }}">
+              <span style="flex:none;font:400 13px ui-monospace,monospace;color:rgba(74,53,32,.28);cursor:grab;letter-spacing:-1px">⠿</span>
+              <div style="flex:1;min-width:0">
+                <input value="{{ c.title }}" onChange="{{ c.onName }}" style="width:100%;box-sizing:border-box;font:400 14px 'Gowun Batang',serif;color:#4A3520;border:none;background:transparent;padding:2px 4px;margin-left:-4px;border-radius:6px" style-focus="background:#F6F1E8"></input>
+                <div style="font:300 10px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.45);margin-top:2px">{{ c.meta }} · 이름 탭해서 수정</div>
+              </div>
+              <div style="flex:none;display:flex;gap:4px">
+                <button onClick="{{ c.up }}" title="위로" style="width:26px;height:26px;border-radius:9px;border:1px solid rgba(119,85,55,.14);background:#FDFBF7;color:{{ c.upFg }};font-size:9px;cursor:pointer">▲</button>
+                <button onClick="{{ c.down }}" title="아래로" style="width:26px;height:26px;border-radius:9px;border:1px solid rgba(119,85,55,.14);background:#FDFBF7;color:{{ c.downFg }};font-size:9px;cursor:pointer">▼</button>
+              </div>
+              <button onClick="{{ c.toggleVis }}" title="표시 전환" style="flex:none;width:40px;height:24px;border-radius:12px;border:none;background:{{ c.switchBg }};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:{{ c.switchJustify }}">
+                <span style="width:18px;height:18px;border-radius:50%;background:#fff;margin:0 3px;box-shadow:0 1px 3px rgba(53,37,22,.25)"></span>
+              </button>
+            </div>
+          </sc-for>
+
+          <button onClick="{{ addCat }}" style="height:48px;border-radius:18px;border:1.5px dashed rgba(119,85,55,.3);background:transparent;color:#775537;font:400 12.5px 'Noto Sans KR',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <span style="font-size:14px;line-height:1">+</span>
+            <span>카테고리 추가</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font:400 10.5px 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.55);letter-spacing:.2px;margin-bottom:10px">페이지 설정</div>
+        <div style="background:#fff;border:1px solid rgba(119,85,55,.08);border-radius:20px;box-shadow:0 2px 8px rgba(119,85,55,.06);overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 15px">
+            <div style="flex:1">
+              <div style="font:400 12.5px 'Noto Sans KR',sans-serif;color:#4A3520">상단 안내 배너</div>
+              <div style="font:300 10px/1.5 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.45);margin-top:2px">제휴 수수료 문구 노출</div>
+            </div>
+            <button onClick="{{ toggleBanner }}" style="flex:none;width:40px;height:24px;border-radius:12px;border:none;background:{{ bannerBg }};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:{{ bannerJustify }}">
+              <span style="width:18px;height:18px;border-radius:50%;background:#fff;margin:0 3px;box-shadow:0 1px 3px rgba(53,37,22,.25)"></span>
+            </button>
+          </div>
+          <div style="height:1px;background:rgba(119,85,55,.08)"></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 15px">
+            <div style="flex:1">
+              <div style="font:400 12.5px 'Noto Sans KR',sans-serif;color:#4A3520">기본 보기</div>
+              <div style="font:300 10px/1.5 'Noto Sans KR',sans-serif;color:rgba(74,53,32,.45);margin-top:2px">방문자에게 처음 보이는 열 수</div>
+            </div>
+            <div style="flex:none;display:flex;gap:2px;padding:3px;border-radius:12px;background:#F1F1F1">
+              <button onClick="{{ set2 }}" style="width:32px;height:24px;border:none;border-radius:9px;background:{{ bg2 }};color:{{ dot2 }};font:500 11px 'Noto Sans KR',sans-serif;cursor:pointer">2</button>
+              <button onClick="{{ set3 }}" style="width:32px;height:24px;border:none;border-radius:9px;background:{{ bg3 }};color:{{ dot3 }};font:500 11px 'Noto Sans KR',sans-serif;cursor:pointer">3</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:none;padding:12px 22px 24px;background:linear-gradient(to top,#FDFBF7 65%,rgba(253,251,247,0));display:flex;gap:10px">
+      <button style="flex:none;width:56px;height:52px;border-radius:18px;border:1px solid rgba(119,85,55,.18);background:#fff;color:#775537;font-size:15px;cursor:pointer">＋</button>
+      <button style="flex:1;height:52px;border-radius:18px;border:none;background:#775537;color:#FBE29D;font:500 14.5px 'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(119,85,55,.2)">변경 사항 저장</button>
+    </div>
+  </div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:920,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = {
+    query: "", open: { pick: true, cafe: true, beauty: true, travel: false },
+    shareOpen: false, photo: false, title: "", url: "", cat: null, toast: false, cols: 2,
+    order: ["pick", "cafe", "beauty", "travel"], hidden: {}, bannerOn: true, names: {},
+    nick: "연녹의 취향 목록", bio: "독서 · 뷰티 · 라이프 | 오래 쓰고 다시 사는 것만 모아둡니다."
+  };
+
+  move = (id, dir) => this.setState(s => {
+    const o = [...s.order], i = o.indexOf(id), j = i + dir;
+    if (j < 0 || j >= o.length) return null;
+    [o[i], o[j]] = [o[j], o[i]];
+    return { order: o };
+  });
+
+  data = [
+    { id: "pick", title: "이번 달 픽", note: "grid", grid: true, items: [
+      { title: "산미 없는 원두 · 브라질 세하도", host: "coffeelibre.kr", tag: "coffee bag" },
+      { title: "재구매만 네 번째 립밤", host: "smtown.co.kr", tag: "lip balm" },
+      { title: "제주 3박 숙소 기록", host: "stayfolio.com", tag: "stay photo" },
+      { title: "여름 리넨 셔츠", host: "29cm.co.kr", tag: "shirt" }
+    ]},
+    { id: "cafe", title: "카페 · 홈카페", items: [
+      { title: "핸드드립 세트 입문용 3종", host: "coffeelibre.kr", tag: "dripper" },
+      { title: "냉동 원두 보관 밀폐 캐니스터", host: "kinto.jp", tag: "canister" },
+      { title: "얇은 유리 라떼잔", host: "ovject.com", tag: "glass" }
+    ]},
+    { id: "beauty", title: "뷰티", items: [
+      { title: "속건조 잡아주는 앰플", host: "torriden.com", tag: "ampoule" },
+      { title: "무기자차 선크림 SPF50+", host: "roundlab.co.kr", tag: "suncream" },
+      { title: "물빠짐 좋은 톤업 쿠션", host: "clio.co.kr", tag: "cushion" }
+    ]},
+    { id: "travel", title: "여행", items: [
+      { title: "기내용 22인치 캐리어", host: "rimowa.com", tag: "luggage" },
+      { title: "여권 파우치 · 카드 6칸", host: "bellroy.com", tag: "pouch" }
+    ]}
+  ];
+
+  toggle = (id) => this.setState(s => ({ open: { ...s.open, [id]: !s.open[id] } }));
+
+  renderVals() {
+    const q = this.state.query.trim().toLowerCase();
+    const ordered = this.state.order.map(id => this.data.find(d => d.id === id)).filter(Boolean)
+      .map(sec => ({ ...sec, title: this.state.names[sec.id] ?? sec.title }));
+    const secs = ordered.filter(sec => !this.state.hidden[sec.id]).map(sec => {
+      const items = q ? sec.items.filter(i => i.title.toLowerCase().includes(q) || i.host.toLowerCase().includes(q)) : sec.items;
+      const isOpen = q ? true : !!this.state.open[sec.id];
+      return { ...sec, items, count: items.length, caret: isOpen ? "▲" : "▼",
+        openGrid: isOpen && items.length > 0,
+        toggle: () => this.toggle(sec.id) };
+    }).filter(s => !q || s.items.length > 0);
+
+    const cats = ordered.map(s => s.title).map(label => {
+      const on = this.state.cat === label;
+      return { label, pick: () => this.setState(s => ({ cat: s.cat === label ? null : label })),
+        bg: on ? "#775537" : "#fff", fg: on ? "#FBE29D" : "rgba(74,53,32,.7)",
+        border: on ? "#775537" : "rgba(119,85,55,.16)" };
+    });
+
+    const ready = this.state.photo && this.state.title.trim() && this.state.url.trim();
+    const done = c => c ? "#775537" : "rgba(119,85,55,.18)";
+
+    const three = this.state.cols === 3;
+    const adminCats = ordered.map((sec, i) => {
+      const vis = !this.state.hidden[sec.id];
+      return { title: sec.title, meta: vis ? sec.items.length + "개 링크" : "숨김 · " + sec.items.length + "개 링크",
+        opacity: vis ? 1 : .55,
+        up: () => this.move(sec.id, -1), down: () => this.move(sec.id, 1),
+        upFg: i === 0 ? "rgba(74,53,32,.2)" : "#775537",
+        downFg: i === ordered.length - 1 ? "rgba(74,53,32,.2)" : "#775537",
+        toggleVis: () => this.setState(s => ({ hidden: { ...s.hidden, [sec.id]: vis } })),
+        onName: e => { const v = e.target.value; this.setState(s => ({ names: { ...s.names, [sec.id]: v } })); },
+        switchBg: vis ? "#775537" : "rgba(119,85,55,.22)", switchJustify: vis ? "flex-end" : "flex-start" };
+    });
+    return {
+      adminCats, addCat: () => {},
+      nick: this.state.nick, bio: this.state.bio,
+      onNick: e => this.setState({ nick: e.target.value }),
+      onBio: e => this.setState({ bio: e.target.value }),
+      bannerOn: this.state.bannerOn,
+      toggleBanner: () => this.setState(s => ({ bannerOn: !s.bannerOn })),
+      bannerBg: this.state.bannerOn ? "#775537" : "rgba(119,85,55,.22)",
+      bannerJustify: this.state.bannerOn ? "flex-end" : "flex-start",
+      set2: () => this.setState({ cols: 2 }), set3: () => this.setState({ cols: 3 }),
+      bg2: three ? "transparent" : "#fff", bg3: three ? "#fff" : "transparent",
+      dot2: three ? "rgba(74,53,32,.3)" : "#775537", dot3: three ? "#775537" : "rgba(74,53,32,.3)",
+      cols: three ? "1fr 1fr 1fr" : "1fr 1fr", gap: three ? "9px" : "12px",
+      radius: three ? "14px" : "18px", pad: three ? "7px 8px 9px" : "9px 11px 11px",
+      tSize: three ? "12px" : "13.5px", hSize: three ? "9px" : "10.5px",
+      lineH: three ? "37px" : "42px", capH: three ? "53px" : "64px",
+      query: this.state.query, hasQuery: q.length > 0, sections: secs, empty: q.length > 0 && secs.length === 0,
+      onQuery: e => this.setState({ query: e.target.value }), clearQuery: () => this.setState({ query: "" }),
+      shareOpen: this.state.shareOpen, openShare: () => this.setState({ shareOpen: true }),
+      closeShare: () => this.setState({ shareOpen: false }),
+      shareTargets: [{ icon: "◍", label: "카카오톡" }, { icon: "◐", label: "인스타" }, { icon: "✉", label: "메시지" }, { icon: "⋯", label: "더보기" }],
+
+      hasPhoto: this.state.photo, noPhoto: !this.state.photo,
+      addPhoto: () => this.setState({ photo: true }), removePhoto: () => this.setState({ photo: false }),
+      title: this.state.title, onTitle: e => this.setState({ title: e.target.value }),
+      url: this.state.url, onUrl: e => this.setState({ url: e.target.value }),
+      paste: () => this.setState({ url: "https://coffeelibre.kr/product/cerrado" }),
+      cats,
+      step1: done(this.state.photo), step2: done(!!this.state.title.trim()), step3: done(!!this.state.url.trim()),
+      btnBg: ready ? "#775537" : "rgba(119,85,55,.16)",
+      btnFg: ready ? "#FBE29D" : "rgba(74,53,32,.42)",
+      btnLabel: ready ? "등록하기" : "사진 · 제목 · 링크를 채워주세요",
+      toast: this.state.toast,
+      submit: () => { if (!ready) return; this.setState({ toast: true });
+        clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: false, photo: false, title: "", url: "", cat: null }), 2200); }
+    };
+  }
+}
+</script>
+</body>
+</html>

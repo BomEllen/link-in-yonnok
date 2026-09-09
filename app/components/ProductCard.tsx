@@ -19,10 +19,13 @@ export function ProductCard({
         cols === 2 ? "rounded-card2" : "rounded-card3"
       )}
     >
-      <div className="relative min-h-0 flex-1 bg-thumb-placeholder p-[7px]">
-        <span className="absolute bottom-[7px] left-[7px] rounded-[4px] bg-white/75 px-[5px] py-[2px] font-mono text-[8px] text-ink">
-          {link.thumbnail_label}
-        </span>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {link.thumbnail_url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- Storage 도메인이 정해지는 5단계에서 next/image로 교체
+          <img src={link.thumbnail_url} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="h-full w-full bg-thumb-placeholder" />
+        )}
       </div>
       <div
         className={cx(

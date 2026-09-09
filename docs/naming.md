@@ -35,7 +35,10 @@
 | `url` | `url` | 동일 |
 | `position` | **`order_index`** | **필드명 자체가 바뀜.** Category와 동일한 이유 |
 | `createdAt` | `created_at` | 표기만 다름 |
-| _(README에 없음)_ | `thumbnail_label` | 디자인 프로토타입의 플레이스홀더 주석(`coffee bag` 등)을 담아두는 임시 필드. 실제 이미지 업로드 붙는 5단계 이후 제거 예정 |
+
+> `thumbnail_label`(디자인 프로토타입의 `coffee bag` 등 플레이스홀더 주석)은 1단계 더미 데이터 단계에서만
+> 쓰던 임시 필드였고 DB 스키마에는 포함하지 않았다. `thumbnail_url`이 비어 있으면 카드가 스트라이프
+> 플레이스홀더만 보여주고, 값이 있으면 실제 이미지를 렌더링한다(5단계에서 업로드 붙기 전까지는 항상 빈 값).
 
 ## 정렬/조회 규칙 (프롬프트 지시, README 외 추가)
 - 정렬은 항상 `order_index ASC`.

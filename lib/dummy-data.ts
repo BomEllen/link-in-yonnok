@@ -1,7 +1,8 @@
 import type { Category, Link, Profile } from "./types";
 
 // 1단계(공개 메인 픽셀 맞추기)용 더미 데이터.
-// 2단계에서 Supabase 실 데이터로 교체된다.
+// 2단계부터 공개 페이지는 Supabase 실 데이터(supabase/seed.sql에 동일 내용)를 쓴다.
+// 현재 어디에서도 import되지 않는 상태 — 삭제할지 확인 필요.
 
 export const dummyProfile: Profile = {
   avatar_url: "",
@@ -25,7 +26,6 @@ export const dummyLinks: Link[] = [
     id: "l1",
     category_id: "cafe",
     thumbnail_url: "",
-    thumbnail_label: "coffee bag",
     title: "핸드드립 원두 - 에티오피아 예가체프 200g",
     url: "https://smartstore.naver.com/coffee-roastery/products/1",
     order_index: 0,
@@ -35,7 +35,6 @@ export const dummyLinks: Link[] = [
     id: "l2",
     category_id: "cafe",
     thumbnail_url: "",
-    thumbnail_label: "dripper",
     title: "도자기 드리퍼 1~2인용",
     url: "https://www.coupang.com/vp/products/2",
     order_index: 1,
@@ -45,7 +44,6 @@ export const dummyLinks: Link[] = [
     id: "l3",
     category_id: "cafe",
     thumbnail_url: "",
-    thumbnail_label: "canister",
     title: "원두 보관용 밀폐 캐니스터",
     url: "https://www.oliveyoung.co.kr/store/goods/3",
     order_index: 2,
@@ -55,7 +53,6 @@ export const dummyLinks: Link[] = [
     id: "l4",
     category_id: "cafe",
     thumbnail_url: "",
-    thumbnail_label: "glass",
     title: "내열 유리 커피잔 세트",
     url: "https://www.oliveyoung.co.kr/store/goods/4",
     order_index: 3,
@@ -65,7 +62,6 @@ export const dummyLinks: Link[] = [
     id: "l5",
     category_id: "beauty",
     thumbnail_url: "",
-    thumbnail_label: "lip balm",
     title: "촉촉 립밤 무색 3g",
     url: "https://www.oliveyoung.co.kr/store/goods/5",
     order_index: 0,
@@ -75,7 +71,6 @@ export const dummyLinks: Link[] = [
     id: "l6",
     category_id: "beauty",
     thumbnail_url: "",
-    thumbnail_label: "ampoule",
     title: "저자극 진정 앰플 30ml",
     url: "https://www.coupang.com/vp/products/6",
     order_index: 1,
@@ -85,7 +80,6 @@ export const dummyLinks: Link[] = [
     id: "l7",
     category_id: "beauty",
     thumbnail_url: "",
-    thumbnail_label: "suncream",
     title: "무기자차 선크림 SPF50+",
     url: "https://www.oliveyoung.co.kr/store/goods/7",
     order_index: 2,
@@ -95,7 +89,6 @@ export const dummyLinks: Link[] = [
     id: "l8",
     category_id: "beauty",
     thumbnail_url: "",
-    thumbnail_label: "cushion",
     title: "글로우 쿠션 21호",
     url: "https://www.oliveyoung.co.kr/store/goods/8",
     order_index: 3,
@@ -105,7 +98,6 @@ export const dummyLinks: Link[] = [
     id: "l9",
     category_id: "travel",
     thumbnail_url: "",
-    thumbnail_label: "stay photo",
     title: "제주 오션뷰 숙소 예약 링크",
     url: "https://www.yanolja.com/reservation/9",
     order_index: 0,
@@ -115,7 +107,6 @@ export const dummyLinks: Link[] = [
     id: "l10",
     category_id: "travel",
     thumbnail_url: "",
-    thumbnail_label: "luggage",
     title: "기내용 캐리어 20인치",
     url: "https://www.coupang.com/vp/products/10",
     order_index: 1,
@@ -125,7 +116,6 @@ export const dummyLinks: Link[] = [
     id: "l11",
     category_id: "travel",
     thumbnail_url: "",
-    thumbnail_label: "pouch",
     title: "여행용 세면 파우치",
     url: "https://www.coupang.com/vp/products/11",
     order_index: 2,
@@ -135,7 +125,6 @@ export const dummyLinks: Link[] = [
     id: "l12",
     category_id: "draft",
     thumbnail_url: "",
-    thumbnail_label: "shirt",
     title: "비공개 카테고리 테스트 링크",
     url: "https://example.com/12",
     order_index: 0,
@@ -145,7 +134,6 @@ export const dummyLinks: Link[] = [
     id: "l13",
     category_id: null,
     thumbnail_url: "",
-    thumbnail_label: "unsorted",
     title: "미분류 링크 - 공개 페이지에는 렌더링되지 않음",
     url: "https://example.com/13",
     order_index: 0,

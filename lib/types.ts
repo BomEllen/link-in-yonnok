@@ -22,8 +22,6 @@ export type Link = {
   id: string;
   category_id: string | null;
   thumbnail_url: string;
-  // 플레이스홀더 이미지 위에 얹는 설명 라벨. 실제 이미지로 교체하면서 제거될 필드.
-  thumbnail_label: string;
   title: string;
   url: string;
   order_index: number;

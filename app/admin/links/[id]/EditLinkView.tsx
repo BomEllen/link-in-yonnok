@@ -135,7 +135,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
   }
 
   function handleSubmit() {
-    if (!canSubmit || submitting) return;
+    if (!canSubmit || !dirty || submitting) return;
     setSubmitting(true);
     setFormError(null);
     updateLink(link.id, {
@@ -204,8 +204,15 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
           />
           {thumbnail.url ? (
             <div className="relative aspect-square w-full overflow-hidden rounded-upload">
-              {/* eslint-disable-next-line @next/next/no-img-element -- Storage 공개 URL */}
-              <img src={thumbnail.url} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="사진 다시 선택"
+                className="block h-full w-full"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- Storage 공개 URL */}
+                <img src={thumbnail.url} alt="" className="h-full w-full object-cover" />
+              </button>
               <button
                 type="button"
                 onClick={handleRemoveThumbnail}
@@ -301,10 +308,10 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!canSubmit || submitting}
+          disabled={!canSubmit || !dirty || submitting}
           className={cx(
             "h-14 w-full rounded-cta text-cta font-medium",
-            canSubmit && !submitting
+            canSubmit && dirty && !submitting
               ? "bg-brand text-brand-ink shadow-cta"
               : "bg-brand/[16%] text-ink/42"
           )}

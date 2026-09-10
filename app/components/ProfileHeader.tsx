@@ -16,7 +16,12 @@ export function ProfileHeader({
         aria-hidden
       />
       <div className="relative flex items-start justify-between">
-        <div className="h-[78px] w-[78px] shrink-0 rounded-full border border-brand/[18%] bg-avatar-placeholder" />
+        <div className="h-[78px] w-[78px] shrink-0 overflow-hidden rounded-full border border-brand/[18%] bg-avatar-placeholder">
+          {profile.avatar_url && (
+            // eslint-disable-next-line @next/next/no-img-element -- Storage 공개 URL
+            <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"

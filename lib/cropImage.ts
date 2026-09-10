@@ -1,5 +1,5 @@
 // react-easy-crop이 돌려주는 픽셀 단위 crop 영역으로 원본 이미지를 잘라
-// 정사각형 JPEG Blob으로 만든다.
+// 정사각형 JPEG Blob으로 만든다. 링크 썸네일/프로필 아바타 업로드가 공유해서 쓴다.
 
 type PixelCrop = { x: number; y: number; width: number; height: number };
 

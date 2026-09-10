@@ -9,7 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Pencil, Pin, Plus } from "lucide-react";
+import { Pin, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -17,6 +17,7 @@ import { Switch } from "@/app/components/Switch";
 import type { Category, Profile } from "@/lib/types";
 import { cx } from "@/lib/utils";
 import { logout, saveAdminChanges } from "./actions";
+import { type AvatarValue, AvatarUploader } from "./AvatarUploader";
 import { CategoryRow } from "./CategoryRow";
 import type { CategoryDraft, ProfileDraft } from "./types";
 
@@ -44,6 +45,10 @@ export function AdminView({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  const [avatar, setAvatar] = useState<AvatarValue>({
+    url: profile.avatar_url,
+    path: null,
+  });
   const [nickname, setNickname] = useState(profile.nickname);
   const [bio, setBio] = useState(profile.bio);
   const [bannerEnabled, setBannerEnabled] = useState(profile.banner_enabled);
@@ -58,6 +63,7 @@ export function AdminView({
   // 저장 성공 시에만 갱신한다. ref가 아니라 state로 두는 이유: useMemo 등 렌더 중
   // 코드에서 값을 읽어야 하는데, 렌더 중 ref.current 읽기는 금지되어 있다(react-hooks/refs).
   const [savedSnapshot, setSavedSnapshot] = useState({
+    avatarUrl: profile.avatar_url,
     nickname: profile.nickname,
     bio: profile.bio,
     bannerEnabled: profile.banner_enabled,
@@ -73,6 +79,7 @@ export function AdminView({
     const strip = (list: CategoryDraft[]) =>
       list.map(({ id, name, hidden, is_pinned }) => ({ id, name, hidden, is_pinned }));
     return (
+      avatar.url !== savedSnapshot.avatarUrl ||
       nickname !== savedSnapshot.nickname ||
       bio !== savedSnapshot.bio ||
       bannerEnabled !== savedSnapshot.bannerEnabled ||
@@ -81,7 +88,17 @@ export function AdminView({
       deletedIds.length > 0 ||
       JSON.stringify(strip(categoryDrafts)) !== JSON.stringify(strip(savedSnapshot.categories))
     );
-  }, [nickname, bio, bannerEnabled, defaultColumns, footerText, categoryDrafts, deletedIds, savedSnapshot]);
+  }, [
+    avatar.url,
+    nickname,
+    bio,
+    bannerEnabled,
+    defaultColumns,
+    footerText,
+    categoryDrafts,
+    deletedIds,
+    savedSnapshot,
+  ]);
 
   const confirmLeaveIfDirty = () => {
     if (!dirty) return true;
@@ -172,6 +189,7 @@ export function AdminView({
   function handleSave() {
     setSaveError(null);
     const profileDraft: ProfileDraft = {
+      avatar_url: avatar.url,
       nickname: nickname.trim(),
       bio: bio.trim(),
       banner_enabled: bannerEnabled,
@@ -194,6 +212,7 @@ export function AdminView({
       setCategoryDrafts(freshDrafts);
       setDeletedIds([]);
       setSavedSnapshot({
+        avatarUrl: profileDraft.avatar_url,
         nickname: profileDraft.nickname,
         bio: profileDraft.bio,
         bannerEnabled: profileDraft.banner_enabled,
@@ -240,32 +259,7 @@ export function AdminView({
 
       {/* README Screen 3 - 2. 프로필 카드 */}
       <section className="mb-[22px] rounded-admin-card bg-white p-4 shadow-admin-card">
-        <div className="flex items-center gap-4">
-          <div className="relative h-[62px] w-[62px] shrink-0">
-            <div className="h-full w-full rounded-full bg-avatar-placeholder" />
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-brand-ink">
-              <Pencil size={12} className="text-brand" />
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              disabled
-              title="5단계(이미지 업로드)에서 연결됩니다"
-              className="h-8 rounded-full bg-brand px-3 text-btn-sm font-medium text-brand-ink opacity-50"
-            >
-              사진 변경
-            </button>
-            <button
-              type="button"
-              disabled
-              title="5단계(이미지 업로드)에서 연결됩니다"
-              className="h-[30px] rounded-full border border-brand/[18%] px-3 text-btn-sm text-ink/55 opacity-50"
-            >
-              기본 이미지로
-            </button>
-          </div>
-        </div>
+        <AvatarUploader value={avatar} onChange={setAvatar} />
         <div className="mt-4 flex flex-col gap-2 border-t border-brand/[8%] pt-4">
           <input
             value={nickname}

@@ -3,18 +3,14 @@
 import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import Cropper, { type Area } from "react-easy-crop";
-import "react-easy-crop/react-easy-crop.css";
+import { useEffect, useState } from "react";
+import { CropperOverlay } from "@/app/admin/CropperOverlay";
 import { Switch } from "@/app/components/Switch";
 import { fetchLinkMetadata } from "@/lib/fetchLinkMetadata";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser-client";
 import type { Category, Link as LinkItem } from "@/lib/types";
 import { cx } from "@/lib/utils";
+import { useImageCropper } from "../../useImageCropper";
 import { deleteLink, updateLink } from "../actions";
-import { getCroppedImageBlob } from "../../new/cropImage";
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // app/admin/new/NewLinkView와 같은 폼 UI를 재사용하되, 기존 값으로 채워서 시작하고
 // "등록"이 아니라 "저장"/"삭제"로 끝난다.
@@ -23,17 +19,11 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
   const pinnedCategory = categories.find((c) => c.is_pinned) ?? null;
   const regularCategories = categories.filter((c) => !c.is_pinned);
 
+  const cropper = useImageCropper("link-thumbnails");
   const [thumbnail, setThumbnail] = useState<{ url: string; path: string | null }>({
     url: link.thumbnail_url,
     path: null,
   });
-  const [uploading, setUploading] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const croppedAreaRef = useRef<Area | null>(null);
 
   const [title, setTitle] = useState(link.title);
   const [url, setUrl] = useState(link.url);
@@ -45,8 +35,6 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dirty =
     thumbnail.url !== link.thumbnail_url ||
@@ -73,57 +61,13 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
     }
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setFormError("이미지 파일만 선택할 수 있어요");
-      return;
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      setFormError("10MB 이하 이미지만 가능해요");
-      return;
-    }
-    setFormError(null);
-    setCrop({ x: 0, y: 0 });
-    setZoom(1);
-    setCropSrc(URL.createObjectURL(file));
-  }
-
-  function closeCropper() {
-    if (cropSrc) URL.revokeObjectURL(cropSrc);
-    setCropSrc(null);
-  }
-
   async function handleCropConfirm() {
-    if (!cropSrc || !croppedAreaRef.current) return;
-    setUploading(true);
-    setFormError(null);
-    try {
-      const blob = await getCroppedImageBlob(cropSrc, croppedAreaRef.current);
-      const supabase = createBrowserSupabaseClient();
-      const path = `${crypto.randomUUID()}.jpg`;
-      const { error: uploadErr } = await supabase.storage
-        .from("link-thumbnails")
-        .upload(path, blob, { contentType: "image/jpeg", upsert: false });
-      if (uploadErr) throw uploadErr;
-
-      const { data } = supabase.storage.from("link-thumbnails").getPublicUrl(path);
-      setThumbnail({ url: data.publicUrl, path });
-      closeCropper();
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : "업로드에 실패했어요");
-    } finally {
-      setUploading(false);
-    }
+    const result = await cropper.confirmCrop();
+    if (result) setThumbnail(result);
   }
 
   async function handleRemoveThumbnail() {
-    if (thumbnail.path) {
-      const supabase = createBrowserSupabaseClient();
-      await supabase.storage.from("link-thumbnails").remove([thumbnail.path]);
-    }
+    await cropper.removeUploaded(thumbnail.path);
     setThumbnail({ url: "", path: null });
   }
 
@@ -151,9 +95,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
         setTitle((prev) => (prev.trim() === "" ? (result.title as string) : prev));
       }
       if (result.imageDataUrl && !thumbnail.url) {
-        setCrop({ x: 0, y: 0 });
-        setZoom(1);
-        setCropSrc(result.imageDataUrl);
+        cropper.openWithSrc(result.imageDataUrl);
       }
     } finally {
       setFetchingMeta(false);
@@ -163,7 +105,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
   function handleSubmit() {
     if (!canSubmit || !dirty || submitting) return;
     setSubmitting(true);
-    setFormError(null);
+    cropper.setError(null);
     updateLink(link.id, {
       thumbnail_url: thumbnail.url,
       title,
@@ -173,7 +115,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
     }).then((result) => {
       setSubmitting(false);
       if (!result.ok) {
-        setFormError(result.message);
+        cropper.setError(result.message);
         return;
       }
       router.push("/admin/links");
@@ -187,7 +129,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
     deleteLink(link.id).then((result) => {
       setDeleting(false);
       if (!result.ok) {
-        setFormError(result.message);
+        cropper.setError(result.message);
         return;
       }
       router.push("/admin/links");
@@ -222,17 +164,17 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
       <div className="flex-1 space-y-4 px-[22px] pb-32">
         <div>
           <input
-            ref={fileInputRef}
+            ref={cropper.fileInputRef}
             type="file"
             accept="image/*"
-            onChange={handleFileChange}
+            onChange={cropper.handleFileChange}
             className="hidden"
           />
           {thumbnail.url ? (
             <div className="relative aspect-square w-full overflow-hidden rounded-upload">
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={cropper.openFilePicker}
                 aria-label="사진 다시 선택"
                 className="block h-full w-full"
               >
@@ -251,7 +193,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
           ) : (
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={cropper.openFilePicker}
               className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-upload border-[1.5px] border-dashed border-brand/[35%] bg-upload"
             >
               <span className="flex h-[50px] w-[50px] items-center justify-center rounded-full bg-brand-ink">
@@ -261,7 +203,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
               <span className="text-[10.5px] text-ink/45">탭해서 앨범에서 선택 · 1:1 권장</span>
             </button>
           )}
-          {formError && <p className="mt-2 text-[11.5px] text-ink/66">{formError}</p>}
+          {cropper.error && <p className="mt-2 text-[11.5px] text-ink/66">{cropper.error}</p>}
         </div>
 
         <div>
@@ -351,40 +293,19 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
         </button>
       </div>
 
-      {cropSrc && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-ink">
-          <div className="relative flex-1">
-            <Cropper
-              image={cropSrc}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              cropShape="rect"
-              showGrid={false}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={(_, areaPixels) => {
-                croppedAreaRef.current = areaPixels;
-              }}
-            />
-          </div>
-          <div className="bg-ink px-6 py-5">
-            {formError && <p className="mb-3 text-center text-[11.5px] text-white/80">{formError}</p>}
-            <div className="flex items-center justify-between gap-3">
-              <button type="button" onClick={closeCropper} className="text-btn-sm text-white/70">
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={handleCropConfirm}
-                disabled={uploading}
-                className="h-11 rounded-full bg-brand-ink px-6 text-btn-sm font-medium text-brand"
-              >
-                {uploading ? "업로드 중…" : "자르기 완료"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {cropper.cropSrc && (
+        <CropperOverlay
+          cropSrc={cropper.cropSrc}
+          crop={cropper.crop}
+          zoom={cropper.zoom}
+          uploading={cropper.uploading}
+          error={cropper.error}
+          onCropChange={cropper.setCrop}
+          onZoomChange={cropper.setZoom}
+          onCropComplete={cropper.setCroppedArea}
+          onCancel={cropper.closeCropper}
+          onConfirm={handleCropConfirm}
+        />
       )}
     </div>
   );

@@ -10,6 +10,7 @@ export type CategoryDraft = {
 };
 
 export type ProfileDraft = {
+  avatar_url: string;
   nickname: string;
   bio: string;
   banner_enabled: boolean;

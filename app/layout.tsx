@@ -26,8 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={`${gowunBatang.variable} ${notoSansKr.variable}`}>
-      <body className="font-sans">{children}</body>
+    <html lang="ko" className={`${gowunBatang.variable} ${notoSansKr.variable}`} suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

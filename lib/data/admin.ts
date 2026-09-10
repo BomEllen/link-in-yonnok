@@ -36,3 +36,16 @@ export async function getAdminPageData(): Promise<{
     linkCountByCategory,
   };
 }
+
+// 등록 화면(app/admin/new)의 카테고리 chip 목록용 - hidden 포함 전체를 순서대로.
+export async function getCategoriesForAdmin(): Promise<Category[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("order_index", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) throw error;
+  return data ?? [];
+}

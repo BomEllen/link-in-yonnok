@@ -22,7 +22,7 @@ export default async function LoginPage({
           required
           autoComplete="email"
           placeholder="you@example.com"
-          className="h-[52px] rounded-input border border-brand/[14%] bg-white px-4 text-input text-ink shadow-input outline-none"
+          className="h-[52px] rounded-input border border-brand/[14%] bg-white px-4 text-[16px] text-ink shadow-input outline-none sm:text-[14px]"
         />
         <input
           type="password"
@@ -30,7 +30,7 @@ export default async function LoginPage({
           required
           autoComplete="current-password"
           placeholder="비밀번호"
-          className="h-[52px] rounded-input border border-brand/[14%] bg-white px-4 text-input text-ink shadow-input outline-none"
+          className="h-[52px] rounded-input border border-brand/[14%] bg-white px-4 text-[16px] text-ink shadow-input outline-none sm:text-[14px]"
         />
         <button
           type="submit"

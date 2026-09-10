@@ -63,7 +63,7 @@ export function CategoryRow({
           onChange={(e) => onNameChange(e.target.value)}
           placeholder="카테고리 이름"
           autoFocus={autoFocus}
-          className="w-full rounded-[6px] bg-transparent px-1 font-display text-[14px] text-ink outline-none focus:bg-upload"
+          className="w-full rounded-[6px] bg-transparent px-1 font-display text-[16px] text-ink outline-none focus:bg-upload sm:text-[14px]"
         />
         <p className="truncate px-1 text-[10.5px] text-ink/45">
           {category.hidden ? `숨김 · ${linkCount}개 링크` : `${linkCount}개 링크 · 이름 탭해서 수정`}

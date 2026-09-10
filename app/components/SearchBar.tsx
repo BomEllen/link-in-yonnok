@@ -15,7 +15,7 @@ export function SearchBar({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="상품 · 링크 제목 검색"
-        className="w-full bg-transparent text-input text-ink outline-none placeholder:text-ink/45"
+        className="w-full bg-transparent text-[16px] text-ink outline-none placeholder:text-ink/45 sm:text-[14px]"
       />
       {value && (
         <button

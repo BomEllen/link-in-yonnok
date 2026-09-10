@@ -237,13 +237,13 @@ export function AdminView({
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             placeholder="닉네임"
-            className="h-11 rounded-[14px] bg-surface px-3 font-display text-[14px] text-ink outline-none"
+            className="h-11 rounded-[14px] bg-surface px-3 font-display text-[16px] text-ink outline-none sm:text-[14px]"
           />
           <input
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="한 줄 소개"
-            className="h-11 rounded-[14px] bg-surface px-3 text-input text-ink outline-none"
+            className="h-11 rounded-[14px] bg-surface px-3 text-[16px] text-ink outline-none sm:text-[14px]"
           />
         </div>
       </section>
@@ -329,14 +329,13 @@ export function AdminView({
         </div>
         <div className="border-t border-brand/[8%] p-4">
           <p className="text-input text-ink">푸터 문구</p>
-          <p className="mt-0.5 text-[10.5px] text-ink/45">
-            공개 페이지 맨 아래, &quot;이 링크는 {nickname || "OOO"}가 직접 관리합니다&quot; 다음 줄
-          </p>
-          <input
+          <p className="mt-0.5 text-[10.5px] text-ink/45">공개 페이지 맨 아래에 그대로 표시됩니다 (여러 줄 가능)</p>
+          <textarea
             value={footerText}
             onChange={(e) => setFooterText(e.target.value)}
-            placeholder="© 2026 seoyeon.link"
-            className="mt-2 h-11 w-full rounded-[14px] bg-surface px-3 font-mono text-[12px] text-ink outline-none"
+            placeholder={"이 링크는 OOO가 직접 관리합니다\n© 2026 seoyeon.link"}
+            rows={2}
+            className="mt-2 w-full resize-none rounded-[14px] bg-surface px-3 py-2 font-mono text-[16px] text-ink outline-none sm:text-[12px]"
           />
         </div>
       </section>

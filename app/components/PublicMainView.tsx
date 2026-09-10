@@ -84,7 +84,7 @@ export function PublicMainView({
               category={category}
               links={links}
               cols={cols}
-              open={isSearching ? true : (open[category.id] ?? true)}
+              open={open[category.id] ?? true}
               onToggle={() =>
                 setOpen((prev) => ({
                   ...prev,
@@ -96,7 +96,7 @@ export function PublicMainView({
         )}
       </div>
 
-      <SiteFooter nickname={profile.nickname} footerText={profile.footer_text} />
+      <SiteFooter footerText={profile.footer_text} />
 
       <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} shareUrl="seoyeon.link" />
     </div>

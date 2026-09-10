@@ -1,27 +1,31 @@
 "use client";
 
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { Switch } from "@/app/components/Switch";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser-client";
-import type { Category } from "@/lib/types";
+import type { Category, Link as LinkItem } from "@/lib/types";
 import { cx } from "@/lib/utils";
-import { createLink } from "./actions";
-import { getCroppedImageBlob } from "./cropImage";
+import { deleteLink, updateLink } from "../actions";
+import { getCroppedImageBlob } from "../../new/cropImage";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-// README Screen 2 - 새 링크 등록. 시안엔 없던 이미지 크롭/업로드는 react-easy-crop +
-// Supabase Storage(link-thumbnails 버킷)로 구현. "이번달 픽" 토글도 시안엔 없음.
-export function NewLinkView({ categories }: { categories: Category[] }) {
+// app/admin/new/NewLinkView와 같은 폼 UI를 재사용하되, 기존 값으로 채워서 시작하고
+// "등록"이 아니라 "저장"/"삭제"로 끝난다.
+export function EditLinkView({ link, categories }: { link: LinkItem; categories: Category[] }) {
+  const router = useRouter();
   const pinnedCategory = categories.find((c) => c.is_pinned) ?? null;
   const regularCategories = categories.filter((c) => !c.is_pinned);
-  const [pinned, setPinned] = useState(false);
 
-  const [thumbnail, setThumbnail] = useState<{ url: string; path: string } | null>(null);
+  const [thumbnail, setThumbnail] = useState<{ url: string; path: string | null }>({
+    url: link.thumbnail_url,
+    path: null,
+  });
   const [uploading, setUploading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -30,20 +34,46 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
   const [zoom, setZoom] = useState(1);
   const croppedAreaRef = useRef<Area | null>(null);
 
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [title, setTitle] = useState(link.title);
+  const [url, setUrl] = useState(link.url);
+  const [categoryId, setCategoryId] = useState<string | null>(link.category_id);
+  const [pinned, setPinned] = useState(
+    !!pinnedCategory && link.pinned_category_id === pinnedCategory.id
+  );
 
   const [submitting, setSubmitting] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const canSubmit = !!thumbnail && title.trim() !== "" && url.trim() !== "";
+  const dirty =
+    thumbnail.url !== link.thumbnail_url ||
+    title !== link.title ||
+    url !== link.url ||
+    categoryId !== link.category_id ||
+    pinned !== (!!pinnedCategory && link.pinned_category_id === pinnedCategory.id);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  const canSubmit = !!thumbnail.url && title.trim() !== "" && url.trim() !== "";
+
+  function handleBackClick(e: React.MouseEvent) {
+    if (dirty && !window.confirm("저장하지 않은 변경 사항이 있어요. 그래도 나갈까요?")) {
+      e.preventDefault();
+    }
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    e.target.value = ""; // 같은 파일을 다시 골라도 onChange가 또 나게
+    e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       setFormError("이미지 파일만 선택할 수 있어요");
@@ -88,10 +118,11 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
   }
 
   async function handleRemoveThumbnail() {
-    if (!thumbnail) return;
-    const supabase = createBrowserSupabaseClient();
-    await supabase.storage.from("link-thumbnails").remove([thumbnail.path]);
-    setThumbnail(null);
+    if (thumbnail.path) {
+      const supabase = createBrowserSupabaseClient();
+      await supabase.storage.from("link-thumbnails").remove([thumbnail.path]);
+    }
+    setThumbnail({ url: "", path: null });
   }
 
   async function handlePasteUrl() {
@@ -99,15 +130,15 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
       const text = await navigator.clipboard.readText();
       if (text) setUrl(text.trim());
     } catch {
-      // 클립보드 권한이 없으면 조용히 무시 - 직접 입력하면 된다.
+      // 클립보드 권한이 없으면 조용히 무시.
     }
   }
 
   function handleSubmit() {
-    if (!canSubmit || !thumbnail || submitting) return;
+    if (!canSubmit || submitting) return;
     setSubmitting(true);
     setFormError(null);
-    createLink({
+    updateLink(link.id, {
       thumbnail_url: thumbnail.url,
       title,
       url,
@@ -119,42 +150,47 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
         setFormError(result.message);
         return;
       }
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-        setTitle("");
-        setUrl("");
-        setCategoryId(null);
-        setPinned(false);
-        setThumbnail(null);
-      }, 2200);
+      router.push("/admin/links");
     });
   }
 
-  const stepsDone = [!!thumbnail, title.trim() !== "", url.trim() !== ""];
+  function handleDelete() {
+    if (deleting) return;
+    if (!window.confirm("이 링크를 삭제할까요? 되돌릴 수 없습니다.")) return;
+    setDeleting(true);
+    deleteLink(link.id).then((result) => {
+      setDeleting(false);
+      if (!result.ok) {
+        setFormError(result.message);
+        return;
+      }
+      router.push("/admin/links");
+    });
+  }
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[420px] flex-col bg-surface">
       <header className="flex items-center gap-3 px-[22px] pb-[14px] pt-[22px]">
         <Link
-          href="/admin"
+          href="/admin/links"
+          onClick={handleBackClick}
           aria-label="뒤로가기"
           className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border border-brand/20 text-ink"
         >
           <ArrowLeft size={16} />
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-screen-title text-ink">새 링크 등록</h1>
-          <p className="text-screen-sub font-light text-ink/55">사진 · 제목 · 링크만 있으면 끝</p>
+          <h1 className="font-display text-screen-title text-ink">링크 수정</h1>
         </div>
-        <div className="flex shrink-0 gap-1">
-          {stepsDone.map((done, i) => (
-            <span
-              key={i}
-              className={cx("h-[3px] w-4 rounded-full", done ? "bg-brand" : "bg-brand/[18%]")}
-            />
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting}
+          aria-label="링크 삭제"
+          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border border-brand/20 text-ink/55"
+        >
+          <Trash2 size={16} />
+        </button>
       </header>
 
       <div className="flex-1 space-y-4 px-[22px] pb-32">
@@ -166,13 +202,10 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
             onChange={handleFileChange}
             className="hidden"
           />
-          {thumbnail ? (
-            <div className="relative aspect-square w-full animate-fadein overflow-hidden rounded-upload">
-              {/* eslint-disable-next-line @next/next/no-img-element -- Storage 공개 URL, next/image 도메인 설정 불필요 */}
+          {thumbnail.url ? (
+            <div className="relative aspect-square w-full overflow-hidden rounded-upload">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Storage 공개 URL */}
               <img src={thumbnail.url} alt="" className="h-full w-full object-cover" />
-              <span className="absolute bottom-2 left-2 rounded-[4px] bg-white/75 px-[5px] py-[2px] font-mono text-[8px] text-ink">
-                thumbnail 1:1
-              </span>
               <button
                 type="button"
                 onClick={handleRemoveThumbnail}
@@ -276,21 +309,9 @@ export function NewLinkView({ categories }: { categories: Category[] }) {
               : "bg-brand/[16%] text-ink/42"
           )}
         >
-          {canSubmit ? (submitting ? "등록 중…" : "등록하기") : "사진 · 제목 · 링크를 채워주세요"}
+          {submitting ? "저장 중…" : "저장하기"}
         </button>
-        <p className="mt-2 text-center text-[10.5px] text-ink/45">
-          등록하면 메인 페이지 맨 위에 추가됩니다
-        </p>
       </div>
-
-      {showToast && (
-        <div
-          className="fixed inset-x-6 z-30 mx-auto max-w-[372px] animate-toast-in rounded-2xl bg-ink px-4 py-3 text-center text-[11.5px] text-brand-ink shadow-toast"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 118px)" }}
-        >
-          ✓ 등록 완료 · 메인 페이지에 추가했어요
-        </div>
-      )}
 
       {cropSrc && (
         <div className="fixed inset-0 z-40 flex flex-col bg-ink">

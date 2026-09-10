@@ -8,6 +8,7 @@ export async function createLink(input: {
   title: string;
   url: string;
   category_id: string | null;
+  pinned_category_id: string | null;
 }): Promise<{ ok: true } | { ok: false; message: string }> {
   const supabase = await createClient();
 
@@ -31,6 +32,7 @@ export async function createLink(input: {
 
   const { error } = await supabase.from("links").insert({
     category_id: input.category_id,
+    pinned_category_id: input.pinned_category_id,
     thumbnail_url: input.thumbnail_url,
     title: input.title.trim(),
     url: input.url.trim(),

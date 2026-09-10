@@ -9,7 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Pin, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -21,7 +21,13 @@ import { CategoryRow } from "./CategoryRow";
 import type { CategoryDraft, ProfileDraft } from "./types";
 
 function toDraft(categories: Category[]): CategoryDraft[] {
-  return categories.map((c) => ({ key: c.id, id: c.id, name: c.name, hidden: c.hidden }));
+  return categories.map((c) => ({
+    key: c.id,
+    id: c.id,
+    name: c.name,
+    hidden: c.hidden,
+    is_pinned: c.is_pinned,
+  }));
 }
 
 let tempKeySeq = 0;
@@ -60,8 +66,12 @@ export function AdminView({
     categories: toDraft(categories),
   });
 
+  const pinnedCategory = categoryDrafts.find((c) => c.is_pinned) ?? null;
+  const regularCategories = categoryDrafts.filter((c) => !c.is_pinned);
+
   const dirty = useMemo(() => {
-    const strip = (list: CategoryDraft[]) => list.map(({ id, name, hidden }) => ({ id, name, hidden }));
+    const strip = (list: CategoryDraft[]) =>
+      list.map(({ id, name, hidden, is_pinned }) => ({ id, name, hidden, is_pinned }));
     return (
       nickname !== savedSnapshot.nickname ||
       bio !== savedSnapshot.bio ||
@@ -91,40 +101,51 @@ export function AdminView({
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
+  // 드래그/위아래/삭제는 전부 "고정 아님" 카테고리 안에서만 순서를 바꾼다 -
+  // pinned 카테고리는 항상 맨 앞에 따로 렌더링되고 이 목록엔 안 들어있다.
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     setCategoryDrafts((prev) => {
-      const oldIndex = prev.findIndex((c) => c.key === active.id);
-      const newIndex = prev.findIndex((c) => c.key === over.id);
-      return arrayMove(prev, oldIndex, newIndex);
+      const pinned = prev.filter((c) => c.is_pinned);
+      const regular = prev.filter((c) => !c.is_pinned);
+      const oldIndex = regular.findIndex((c) => c.key === active.id);
+      const newIndex = regular.findIndex((c) => c.key === over.id);
+      return [...pinned, ...arrayMove(regular, oldIndex, newIndex)];
     });
   }
 
-  function updateCategory(index: number, patch: Partial<CategoryDraft>) {
-    setCategoryDrafts((prev) => prev.map((c, i) => (i === index ? { ...c, ...patch } : c)));
+  function updateCategoryByKey(key: string, patch: Partial<CategoryDraft>) {
+    setCategoryDrafts((prev) => prev.map((c) => (c.key === key ? { ...c, ...patch } : c)));
   }
 
-  function moveCategory(from: number, to: number) {
-    if (to < 0 || to >= categoryDrafts.length) return;
-    setCategoryDrafts((prev) => arrayMove(prev, from, to));
+  function moveRegularCategory(key: string, direction: -1 | 1) {
+    setCategoryDrafts((prev) => {
+      const pinned = prev.filter((c) => c.is_pinned);
+      const regular = prev.filter((c) => !c.is_pinned);
+      const idx = regular.findIndex((c) => c.key === key);
+      const newIdx = idx + direction;
+      if (idx === -1 || newIdx < 0 || newIdx >= regular.length) return prev;
+      return [...pinned, ...arrayMove(regular, idx, newIdx)];
+    });
   }
 
   function addCategory() {
     tempKeySeq += 1;
     const key = `new-${tempKeySeq}`;
-    setCategoryDrafts((prev) => [...prev, { key, id: null, name: "", hidden: false }]);
+    setCategoryDrafts((prev) => [...prev, { key, id: null, name: "", hidden: false, is_pinned: false }]);
     setLastAddedKey(key);
   }
 
-  function removeCategory(index: number) {
-    const target = categoryDrafts[index];
+  function removeCategory(key: string) {
+    const target = categoryDrafts.find((c) => c.key === key);
+    if (!target) return;
     const ok = window.confirm(
       `"${target.name || "이름 없는 카테고리"}"를 삭제할까요? 안에 있던 링크는 미분류로 이동합니다.`
     );
     if (!ok) return;
 
-    setCategoryDrafts((prev) => prev.filter((_, i) => i !== index));
+    setCategoryDrafts((prev) => prev.filter((c) => c.key !== key));
     // 신규(아직 저장 안 한) 카테고리는 서버에 존재하지 않으니 그냥 목록에서만 지운다.
     if (target.id) {
       setDeletedIds((prev) => [...prev, target.id as string]);
@@ -135,6 +156,12 @@ export function AdminView({
     e.preventDefault();
     if (!confirmLeaveIfDirty()) return;
     router.push("/admin/new");
+  }
+
+  function handleManageLinksClick(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!confirmLeaveIfDirty()) return;
+    router.push("/admin/links");
   }
 
   function handleLogout() {
@@ -187,6 +214,13 @@ export function AdminView({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/admin/links"
+            onClick={handleManageLinksClick}
+            className="flex h-8 items-center rounded-full border border-brand/20 px-3 text-btn-sm text-ink/66"
+          >
+            링크 관리
+          </Link>
           <Link
             href="/"
             target="_blank"
@@ -255,6 +289,31 @@ export function AdminView({
           <span className="text-[10.5px] text-ink/35">끌어서 순서 변경 · 눈 아이콘으로 숨기기</span>
         </div>
 
+        {pinnedCategory && (
+          <div className="mb-2 flex items-center gap-2 rounded-admin-row bg-white px-[13px] py-3 shadow-admin-card">
+            <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center text-brand">
+              <Pin size={16} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <input
+                value={pinnedCategory.name}
+                onChange={(e) => updateCategoryByKey(pinnedCategory.key, { name: e.target.value })}
+                placeholder="카테고리 이름"
+                className="w-full rounded-[6px] bg-transparent px-1 font-display text-[16px] text-ink outline-none focus:bg-upload sm:text-[14px]"
+              />
+              <p className="truncate px-1 text-[10.5px] text-ink/45">
+                항상 맨 위 고정 ·{" "}
+                {pinnedCategory.id ? (linkCountByCategory[pinnedCategory.id] ?? 0) : 0}개 링크
+              </p>
+            </div>
+            <Switch
+              checked={!pinnedCategory.hidden}
+              onChange={(visible) => updateCategoryByKey(pinnedCategory.key, { hidden: !visible })}
+              ariaLabel={`${pinnedCategory.name || "카테고리"} 노출 여부`}
+            />
+          </div>
+        )}
+
         <DndContext
           id="admin-categories"
           sensors={sensors}
@@ -262,23 +321,23 @@ export function AdminView({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={categoryDrafts.map((c) => c.key)}
+            items={regularCategories.map((c) => c.key)}
             strategy={verticalListSortingStrategy}
           >
             <div className="flex flex-col gap-2">
-              {categoryDrafts.map((cat, i) => (
+              {regularCategories.map((cat, i) => (
                 <CategoryRow
                   key={cat.key}
                   category={cat}
                   linkCount={cat.id ? (linkCountByCategory[cat.id] ?? 0) : 0}
                   isFirst={i === 0}
-                  isLast={i === categoryDrafts.length - 1}
+                  isLast={i === regularCategories.length - 1}
                   autoFocus={cat.key === lastAddedKey}
-                  onNameChange={(name) => updateCategory(i, { name })}
-                  onToggleHidden={(hidden) => updateCategory(i, { hidden })}
-                  onMoveUp={() => moveCategory(i, i - 1)}
-                  onMoveDown={() => moveCategory(i, i + 1)}
-                  onDelete={() => removeCategory(i)}
+                  onNameChange={(name) => updateCategoryByKey(cat.key, { name })}
+                  onToggleHidden={(hidden) => updateCategoryByKey(cat.key, { hidden })}
+                  onMoveUp={() => moveRegularCategory(cat.key, -1)}
+                  onMoveDown={() => moveRegularCategory(cat.key, 1)}
+                  onDelete={() => removeCategory(cat.key)}
                 />
               ))}
             </div>

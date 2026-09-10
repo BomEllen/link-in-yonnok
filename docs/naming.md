@@ -24,6 +24,7 @@
 | `name` | `name` | 동일 |
 | `position` | **`order_index`** | **필드명 자체가 바뀜.** 프롬프트 지시로 정렬 컬럼명을 `order_index`로 통일 |
 | `hidden` | `hidden` | 동일. `true`면 공개 페이지에서 섹션 전체를 숨김 |
+| _(README에 없음)_ | `is_pinned` | "이번달 픽" 기능으로 추가. `true`면 정렬 시 항상 맨 앞(다른 카테고리의 `order_index`와 무관). 보통 한 행만 `true` |
 
 ## Link
 
@@ -36,6 +37,7 @@
 | `url` | `url` | 동일 |
 | `position` | **`order_index`** | **필드명 자체가 바뀜.** Category와 동일한 이유 |
 | `createdAt` | `created_at` | 표기만 다름 |
+| _(README에 없음)_ | `pinned_category_id` | "이번달 픽" 기능으로 추가. `category_id`(원래 카테고리)는 그대로 두고, `is_pinned=true`인 카테고리에 "추가로" 소속시키고 싶을 때만 채운다. 링크 하나가 카테고리 두 곳(원래 + 이번달 픽)에 동시에 보일 수 있는 유일한 통로 |
 
 > `thumbnail_label`(디자인 프로토타입의 `coffee bag` 등 플레이스홀더 주석)은 1단계 더미 데이터 단계에서만
 > 쓰던 임시 필드였고 DB 스키마에는 포함하지 않았다. `thumbnail_url`이 비어 있으면 카드가 스트라이프
@@ -47,4 +49,8 @@
   Link는 `(order_index, created_at)` 순.
 - `Category.hidden = true`→ 공개 메인에서 해당 섹션 통째로 미노출.
 - `Link.category_id IS NULL`→ 공개 메인 미노출, 관리 화면 전용.
+- 카테고리 정렬은 `is_pinned DESC, order_index ASC, id ASC` — pinned 카테고리가 항상
+  최상단, 그 안에서 여러 개면 `order_index`로 tiebreak(현재는 보통 1개뿐).
+- `is_pinned=true`인 카테고리의 소속 링크는 `category_id`가 아니라
+  `pinned_category_id`로 판단한다 (공개/관리 화면 섹션 빌드 로직 공통 규칙).
 - `Profile`은 테이블에 항상 행 1개만 존재.

@@ -13,10 +13,12 @@ export async function getPublicPageData(): Promise<{
 
   const [profileRes, categoriesRes, linksRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", 1).single(),
-    // order_index가 겹칠 수 있으므로 tiebreaker를 둔다 (드래그 정렬 시 순서가 흔들리지 않도록).
+    // is_pinned 카테고리("이번달 픽")가 항상 맨 앞. order_index가 겹칠 수 있으므로
+    // tiebreaker를 둔다 (드래그 정렬 시 순서가 흔들리지 않도록).
     supabase
       .from("categories")
       .select("*")
+      .order("is_pinned", { ascending: false })
       .order("order_index", { ascending: true })
       .order("id", { ascending: true }),
     supabase

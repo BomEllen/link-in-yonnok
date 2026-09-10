@@ -5,6 +5,8 @@ export type CategoryDraft = {
   id: string | null;
   name: string;
   hidden: boolean;
+  // true면 "이번달 픽" 같은 고정 카테고리 - 드래그/삭제 대상에서 제외된다.
+  is_pinned: boolean;
 };
 
 export type ProfileDraft = {

@@ -42,14 +42,28 @@ export function PublicMainView({
     const needle = query.trim().toLowerCase();
     return categories
       .map((category) => {
-        const categoryLinks = links
-          .filter((l) => l.category_id === category.id)
-          .filter(
-            (l) =>
-              !needle ||
-              l.title.toLowerCase().includes(needle) ||
-              getDomain(l.url).toLowerCase().includes(needle)
+        // is_pinned 카테고리("이번달 픽")는 pinned_category_id로 소속을 판단한다 -
+        // category_id(원래 카테고리)는 그대로 둔 채 "추가로" 들어온 링크들이라서.
+        let categoryLinks = category.is_pinned
+          ? links.filter((l) => l.pinned_category_id === category.id)
+          : links.filter((l) => l.category_id === category.id);
+
+        if (category.is_pinned) {
+          // 전체 링크 목록은 order_index로 정렬돼있는데, pinned 소속 링크는
+          // 서로 다른 원래 카테고리에서 온 거라 그 순서가 의미 없다 - 최근
+          // 추가한 순으로 보여준다.
+          categoryLinks = [...categoryLinks].sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
+        }
+
+        categoryLinks = categoryLinks.filter(
+          (l) =>
+            !needle ||
+            l.title.toLowerCase().includes(needle) ||
+            getDomain(l.url).toLowerCase().includes(needle)
+        );
+
         return { category, links: categoryLinks };
       })
       .filter(({ links }) => !isSearching || links.length > 0);

@@ -12,4 +12,5 @@ export type ProfileDraft = {
   bio: string;
   banner_enabled: boolean;
   default_columns: 2 | 3;
+  footer_text: string;
 };

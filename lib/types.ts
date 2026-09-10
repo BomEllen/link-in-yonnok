@@ -9,6 +9,7 @@ export type Profile = {
   banner_text: string;
   default_columns: 2 | 3;
   business_contact_url: string;
+  footer_text: string;
 };
 
 export type Category = {

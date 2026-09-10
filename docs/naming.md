@@ -14,6 +14,7 @@
 | `bannerText` | `banner_text` | 표기만 다름 |
 | `defaultColumns` | `default_columns` | 표기만 다름 |
 | `businessContactUrl` | `business_contact_url` | 표기만 다름 |
+| _(README에 없음)_ | `footer_text` | 4단계 이후 추가. 공개 페이지 푸터 둘째 줄(원래 "© 2026 seoyeon.link" 하드코딩)을 관리 화면에서 편집 가능하게 뺀 필드. 기본값 `© 2026 seoyeon.link` |
 
 ## Category
 

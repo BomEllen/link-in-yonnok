@@ -42,7 +42,9 @@ export function AdminView({
   const [bio, setBio] = useState(profile.bio);
   const [bannerEnabled, setBannerEnabled] = useState(profile.banner_enabled);
   const [defaultColumns, setDefaultColumns] = useState<2 | 3>(profile.default_columns);
+  const [footerText, setFooterText] = useState(profile.footer_text);
   const [categoryDrafts, setCategoryDrafts] = useState<CategoryDraft[]>(() => toDraft(categories));
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [lastAddedKey, setLastAddedKey] = useState<string | null>(null);
 
@@ -54,6 +56,7 @@ export function AdminView({
     bio: profile.bio,
     bannerEnabled: profile.banner_enabled,
     defaultColumns: profile.default_columns,
+    footerText: profile.footer_text,
     categories: toDraft(categories),
   });
 
@@ -64,9 +67,11 @@ export function AdminView({
       bio !== savedSnapshot.bio ||
       bannerEnabled !== savedSnapshot.bannerEnabled ||
       defaultColumns !== savedSnapshot.defaultColumns ||
+      footerText !== savedSnapshot.footerText ||
+      deletedIds.length > 0 ||
       JSON.stringify(strip(categoryDrafts)) !== JSON.stringify(strip(savedSnapshot.categories))
     );
-  }, [nickname, bio, bannerEnabled, defaultColumns, categoryDrafts, savedSnapshot]);
+  }, [nickname, bio, bannerEnabled, defaultColumns, footerText, categoryDrafts, deletedIds, savedSnapshot]);
 
   const confirmLeaveIfDirty = () => {
     if (!dirty) return true;
@@ -112,6 +117,20 @@ export function AdminView({
     setLastAddedKey(key);
   }
 
+  function removeCategory(index: number) {
+    const target = categoryDrafts[index];
+    const ok = window.confirm(
+      `"${target.name || "이름 없는 카테고리"}"를 삭제할까요? 안에 있던 링크는 미분류로 이동합니다.`
+    );
+    if (!ok) return;
+
+    setCategoryDrafts((prev) => prev.filter((_, i) => i !== index));
+    // 신규(아직 저장 안 한) 카테고리는 서버에 존재하지 않으니 그냥 목록에서만 지운다.
+    if (target.id) {
+      setDeletedIds((prev) => [...prev, target.id as string]);
+    }
+  }
+
   function handleNewLinkClick(e: React.MouseEvent) {
     e.preventDefault();
     if (!confirmLeaveIfDirty()) return;
@@ -130,9 +149,10 @@ export function AdminView({
       bio: bio.trim(),
       banner_enabled: bannerEnabled,
       default_columns: defaultColumns,
+      footer_text: footerText.trim(),
     };
     startTransition(async () => {
-      const result = await saveAdminChanges(profileDraft, categoryDrafts);
+      const result = await saveAdminChanges(profileDraft, categoryDrafts, deletedIds);
       if (!result.ok) {
         setSaveError(result.message);
         return;
@@ -143,12 +163,15 @@ export function AdminView({
       const freshDrafts = toDraft(result.categories);
       setNickname(profileDraft.nickname);
       setBio(profileDraft.bio);
+      setFooterText(profileDraft.footer_text);
       setCategoryDrafts(freshDrafts);
+      setDeletedIds([]);
       setSavedSnapshot({
         nickname: profileDraft.nickname,
         bio: profileDraft.bio,
         bannerEnabled: profileDraft.banner_enabled,
         defaultColumns: profileDraft.default_columns,
+        footerText: profileDraft.footer_text,
         categories: freshDrafts,
       });
     });
@@ -255,6 +278,7 @@ export function AdminView({
                   onToggleHidden={(hidden) => updateCategory(i, { hidden })}
                   onMoveUp={() => moveCategory(i, i - 1)}
                   onMoveDown={() => moveCategory(i, i + 1)}
+                  onDelete={() => removeCategory(i)}
                 />
               ))}
             </div>
@@ -302,6 +326,18 @@ export function AdminView({
               ))}
             </div>
           </div>
+        </div>
+        <div className="border-t border-brand/[8%] p-4">
+          <p className="text-input text-ink">푸터 문구</p>
+          <p className="mt-0.5 text-[10.5px] text-ink/45">
+            공개 페이지 맨 아래, &quot;이 링크는 {nickname || "OOO"}가 직접 관리합니다&quot; 다음 줄
+          </p>
+          <input
+            value={footerText}
+            onChange={(e) => setFooterText(e.target.value)}
+            placeholder="© 2026 seoyeon.link"
+            className="mt-2 h-11 w-full rounded-[14px] bg-surface px-3 font-mono text-[12px] text-ink outline-none"
+          />
         </div>
       </section>
 

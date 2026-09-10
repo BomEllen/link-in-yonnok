@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
+import { ChevronDown, ChevronUp, GripVertical, Trash2 } from "lucide-react";
 import { Switch } from "@/app/components/Switch";
 import { cx } from "@/lib/utils";
 import type { CategoryDraft } from "./types";
@@ -20,6 +20,7 @@ export function CategoryRow({
   onToggleHidden,
   onMoveUp,
   onMoveDown,
+  onDelete,
 }: {
   category: CategoryDraft;
   linkCount: number;
@@ -30,6 +31,7 @@ export function CategoryRow({
   onToggleHidden: (hidden: boolean) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onDelete: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: category.key,
@@ -100,6 +102,15 @@ export function CategoryRow({
         onChange={(visible) => onToggleHidden(!visible)}
         ariaLabel={`${category.name || "카테고리"} 노출 여부`}
       />
+
+      <button
+        type="button"
+        onClick={onDelete}
+        aria-label={`${category.name || "카테고리"} 삭제`}
+        className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[9px] text-ink/35"
+      >
+        <Trash2 size={14} />
+      </button>
     </div>
   );
 }

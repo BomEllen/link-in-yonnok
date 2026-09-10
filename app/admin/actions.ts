@@ -12,11 +12,12 @@ export async function logout() {
   redirect("/login");
 }
 
-// 이 화면의 유일한 서버 커밋 지점. 프로필 필드 + 카테고리(이름/노출/순서, 신규 포함)를
-// admin_save_page RPC 한 번 호출로 트랜잭션 처리한다 (중간 실패 시 전부 롤백).
+// 이 화면의 유일한 서버 커밋 지점. 프로필 필드 + 카테고리(이름/노출/순서, 신규/삭제
+// 포함)를 admin_save_page RPC 한 번 호출로 트랜잭션 처리한다 (중간 실패 시 전부 롤백).
 export async function saveAdminChanges(
   profile: ProfileDraft,
-  categories: CategoryDraft[]
+  categories: CategoryDraft[],
+  deletedCategoryIds: string[]
 ): Promise<{ ok: true; categories: Category[] } | { ok: false; message: string }> {
   const supabase = await createClient();
 
@@ -28,6 +29,7 @@ export async function saveAdminChanges(
       hidden,
       order_index: index,
     })),
+    p_deleted_category_ids: deletedCategoryIds,
   });
 
   if (error) {

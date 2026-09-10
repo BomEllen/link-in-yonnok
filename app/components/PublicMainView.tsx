@@ -96,7 +96,7 @@ export function PublicMainView({
         )}
       </div>
 
-      <SiteFooter nickname={profile.nickname} />
+      <SiteFooter nickname={profile.nickname} footerText={profile.footer_text} />
 
       <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} shareUrl="seoyeon.link" />
     </div>

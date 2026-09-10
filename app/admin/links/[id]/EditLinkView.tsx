@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 import { Switch } from "@/app/components/Switch";
+import { fetchLinkMetadata } from "@/lib/fetchLinkMetadata";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser-client";
 import type { Category, Link as LinkItem } from "@/lib/types";
 import { cx } from "@/lib/utils";
@@ -43,6 +44,7 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
 
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [fetchingMeta, setFetchingMeta] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -128,9 +130,33 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
   async function handlePasteUrl() {
     try {
       const text = await navigator.clipboard.readText();
-      if (text) setUrl(text.trim());
+      if (text) {
+        const trimmed = text.trim();
+        setUrl(trimmed);
+        handleUrlPasted(trimmed);
+      }
     } catch {
       // 클립보드 권한이 없으면 조용히 무시.
+    }
+  }
+
+  // 6단계: URL을 붙여넣으면 og:title/og:image를 가져와 제목/사진이 비어있을 때만
+  // 채워준다. 실패해도 조용히 넘어가고 사용자가 직접 입력하면 된다.
+  async function handleUrlPasted(pastedUrl: string) {
+    if (!pastedUrl) return;
+    setFetchingMeta(true);
+    try {
+      const result = await fetchLinkMetadata(pastedUrl);
+      if (result.title) {
+        setTitle((prev) => (prev.trim() === "" ? (result.title as string) : prev));
+      }
+      if (result.imageDataUrl && !thumbnail.url) {
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+        setCropSrc(result.imageDataUrl);
+      }
+    } finally {
+      setFetchingMeta(false);
     }
   }
 
@@ -254,15 +280,20 @@ export function EditLinkView({ link, categories }: { link: LinkItem; categories:
             <input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text").trim();
+                if (text) handleUrlPasted(text);
+              }}
               placeholder="https://"
               className="w-full text-[16px] text-ink outline-none sm:text-[14px]"
             />
             <button
               type="button"
               onClick={handlePasteUrl}
+              disabled={fetchingMeta}
               className="h-9 shrink-0 rounded-[12px] bg-accent px-3 text-btn-sm text-accent-ink"
             >
-              붙여넣기
+              {fetchingMeta ? "가져오는 중…" : "붙여넣기"}
             </button>
           </div>
         </div>

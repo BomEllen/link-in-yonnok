@@ -15,6 +15,10 @@ export function SearchBar({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="상품 · 링크 제목 검색"
+        // iOS의 자동완성류 확장이 하이드레이션 전에 __gcrremoteframetoken 같은
+        // 속성을 이 input에 주입해서 생기는 하이드레이션 경고를 무시한다 -
+        // 우리 코드가 만드는 속성이 아니라 서버 HTML과 항상 다를 수밖에 없다.
+        suppressHydrationWarning
         className="w-full bg-transparent text-[16px] text-ink outline-none placeholder:text-ink/45 sm:text-[14px]"
       />
       {value && (

@@ -72,12 +72,17 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(6px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         fadein: "fadeIn .22s ease",
         "overlay-in": "fadeIn .18s ease",
         "sheet-up": "sheetUp .26s cubic-bezier(.22,.9,.25,1)",
         "toast-in": "toastIn .22s ease",
+        marquee: "marquee 18s linear infinite",
       },
     },
   },

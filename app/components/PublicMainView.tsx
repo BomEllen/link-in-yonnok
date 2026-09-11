@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Category, Link as LinkItem, Profile } from "@/lib/types";
 import { getDomain } from "@/lib/utils";
+import { BusinessContactSheet } from "./BusinessContactSheet";
 import { CategorySection } from "./CategorySection";
 import { ColumnToggle } from "./ColumnToggle";
 import { ProfileHeader } from "./ProfileHeader";
@@ -10,6 +11,10 @@ import { SearchBar } from "./SearchBar";
 import { ShareSheet } from "./ShareSheet";
 import { SiteFooter } from "./SiteFooter";
 import { StickyBanner } from "./StickyBanner";
+
+// 빌드 시 인라인되는 공개 배포 주소. 로컬 개발에서는 .env.local의 값(보통
+// localhost)이 그대로 쓰인다.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://link-in-yonnok.vercel.app";
 
 function buildDefaultOpen(categories: Category[]): Record<string, boolean> {
   // 모든 카테고리를 기본 펼침 상태로 시작한다.
@@ -35,6 +40,7 @@ export function PublicMainView({
   const [cols, setCols] = useState<2 | 3>(profile.default_columns);
   const [open, setOpen] = useState<Record<string, boolean>>(() => buildDefaultOpen(categories));
   const [shareOpen, setShareOpen] = useState(false);
+  const [businessOpen, setBusinessOpen] = useState(false);
 
   const isSearching = query.trim().length > 0;
 
@@ -75,7 +81,11 @@ export function PublicMainView({
     <div className="mx-auto min-h-screen max-w-[420px] bg-surface">
       {profile.banner_enabled && <StickyBanner text={profile.banner_text} />}
 
-      <ProfileHeader profile={profile} onShare={() => setShareOpen(true)} />
+      <ProfileHeader
+        profile={profile}
+        onShare={() => setShareOpen(true)}
+        onBusinessProposal={() => setBusinessOpen(true)}
+      />
 
       <div className="mt-[22px] px-6">
         <SearchBar value={query} onChange={setQuery} />
@@ -112,7 +122,13 @@ export function PublicMainView({
 
       <SiteFooter footerText={profile.footer_text} />
 
-      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} shareUrl="seoyeon.link" />
+      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} shareUrl={SITE_URL} />
+
+      <BusinessContactSheet
+        open={businessOpen}
+        onClose={() => setBusinessOpen(false)}
+        email={profile.business_contact_url}
+      />
     </div>
   );
 }

@@ -5,9 +5,11 @@ import type { Profile } from "@/lib/types";
 export function ProfileHeader({
   profile,
   onShare,
+  onBusinessProposal,
 }: {
   profile: Profile;
   onShare: () => void;
+  onBusinessProposal: () => void;
 }) {
   return (
     <div className="relative overflow-hidden px-6 pt-[26px]">
@@ -31,12 +33,13 @@ export function ProfileHeader({
           >
             <Share2 size={16} strokeWidth={2} />
           </button>
-          <a
-            href={profile.business_contact_url}
+          <button
+            type="button"
+            onClick={onBusinessProposal}
             className="flex h-[38px] items-center rounded-full bg-brand px-4 text-btn-sm font-medium text-brand-ink"
           >
             비즈니스 제안
-          </a>
+          </button>
         </div>
       </div>
       <div className="relative mt-[14px]">

@@ -5,15 +5,15 @@
 :root {
   /* README `## Design Tokens > Colors` — "R G B" triplet 형식.
      tailwind.config.ts에서 rgb(var(--x) / <alpha-value>)로 소비한다. */
-  --color-brand: 119 85 55; /* #775537 Old Copper */
-  --color-brand-ink: 251 226 157; /* #FBE29D Butter Yellow */
-  --color-accent: 192 221 218; /* #C0DDDA Nebula */
-  --color-accent-ink: 62 91 88; /* #3E5B58 */
+  --color-brand: 40 48 28; /* #28301C Dark Green (구 #775537 Old Copper) */
+  --color-brand-ink: 210 219 118; /* #D2DB76 Lime Green (구 #FBE29D Butter Yellow) */
+  --color-accent: 255 195 204; /* #FFC3CC Pink (구 #C0DDDA Nebula) */
+  --color-accent-ink: 40 48 28; /* #28301C, 핑크 위 대비용 (구 #3E5B58) */
   --color-field: 241 241 241; /* #F1F1F1 Seashell */
   --color-surface: 253 251 247; /* #FDFBF7 페이지 배경 */
   --color-upload: 246 241 232; /* #F6F1E8 업로드 박스 배경 */
-  --color-ink: 74 53 32; /* #4A3520 본문 잉크 */
-  --color-overlay: 53 37 22; /* #352516, 시트 오버레이는 alpha .42로 사용 */
+  --color-ink: 40 48 28; /* #28301C Dark Green, brand와 동일값 (구 #4A3520) */
+  --color-overlay: 28 34 20; /* #1C2214, Dark Green보다 한 단계 어두운 값 (구 #352516) */
 }
 
 body {
@@ -26,8 +26,8 @@ body {
   .bg-thumb-placeholder {
     background-image: repeating-linear-gradient(
       135deg,
-      #e7dccb 0 7px,
-      #f4efe6 7px 14px
+      #e5e7cb 0 7px,
+      #f3f4e6 7px 14px
     );
   }
   .bg-avatar-placeholder {

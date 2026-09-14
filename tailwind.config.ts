@@ -51,13 +51,13 @@ const config: Config = {
         "segment-inner": "9px",
       },
       boxShadow: {
-        card: "0 2px 10px rgba(119,85,55,.09)", // 상품 카드
-        "admin-card": "0 2px 8px rgba(119,85,55,.06)",
-        input: "0 1px 4px rgba(119,85,55,.05)",
-        cta: "0 6px 18px rgba(119,85,55,.2)",
-        "cta-sm": "0 3px 10px rgba(119,85,55,.28)", // 작은 알약 버튼
-        toast: "0 8px 24px rgba(53,37,22,.28)",
-        knob: "0 1px 3px rgba(53,37,22,.25)", // 스위치 노브
+        card: "0 2px 10px rgba(40,48,28,.09)", // 상품 카드
+        "admin-card": "0 2px 8px rgba(40,48,28,.06)",
+        input: "0 1px 4px rgba(40,48,28,.05)",
+        cta: "0 6px 18px rgba(40,48,28,.2)",
+        "cta-sm": "0 3px 10px rgba(40,48,28,.28)", // 작은 알약 버튼
+        toast: "0 8px 24px rgba(28,34,20,.28)",
+        knob: "0 1px 3px rgba(28,34,20,.25)", // 스위치 노브
       },
       spacing: {
         touch: "44px", // 최소 터치 타깃

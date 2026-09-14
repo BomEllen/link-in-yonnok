@@ -25,7 +25,7 @@ export function CategorySection({
         className="mb-3 flex w-full items-center gap-2 text-left"
       >
         <span className="font-display text-category-title text-ink">{category.name}</span>
-        <span className="rounded-[9px] bg-brand-ink px-[6px] py-[2px] font-mono text-[10.5px] text-brand">
+        <span className="rounded-[9px] bg-accent px-[6px] py-[2px] font-mono text-[10.5px] text-accent-ink">
           {links.length}
         </span>
         <span className="ml-auto text-ink/45">

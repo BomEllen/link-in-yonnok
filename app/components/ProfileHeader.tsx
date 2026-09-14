@@ -29,7 +29,7 @@ export function ProfileHeader({
             type="button"
             onClick={onShare}
             aria-label="페이지 공유"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-brand/20 bg-white text-brand"
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-accent/20 bg-white text-accent"
           >
             <Share2 size={16} strokeWidth={2} />
           </button>

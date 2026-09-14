@@ -16,7 +16,7 @@ function BannerCopy({ text, hidden = false }: { text: string; hidden?: boolean }
         hidden && "motion-reduce:hidden"
       )}
     >
-      <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-brand-ink" />
+      <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-accent" />
       {text}
     </span>
   );

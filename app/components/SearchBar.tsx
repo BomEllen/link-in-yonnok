@@ -9,7 +9,7 @@ export function SearchBar({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="flex h-[46px] items-center gap-[10px] rounded-[23px] border border-brand/10 bg-field px-4">
+    <div className="flex h-[46px] items-center gap-[10px] rounded-[23px] border border-brand/10 bg-brand-ink/[16%] px-4">
       <Search size={15} strokeWidth={2} className="shrink-0 text-[#667B48]" />
       <input
         value={value}

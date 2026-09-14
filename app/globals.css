@@ -10,7 +10,7 @@
   --color-accent: 255 195 204; /* #FFC3CC Pink (구 #C0DDDA Nebula) */
   --color-accent-ink: 40 48 28; /* #28301C, 핑크 위 대비용 (구 #3E5B58) */
   --color-field: 241 241 241; /* #F1F1F1 Seashell */
-  --color-surface: 253 251 247; /* #FDFBF7 페이지 배경 */
+  --color-surface: 248 249 240; /* #F8F9F0 페이지 배경, 은은한 라임 (구 #FDFBF7) */
   --color-upload: 246 241 232; /* #F6F1E8 업로드 박스 배경 */
   --color-ink: 40 48 28; /* #28301C Dark Green, brand와 동일값 (구 #4A3520) */
   --color-overlay: 28 34 20; /* #1C2214, Dark Green보다 한 단계 어두운 값 (구 #352516) */

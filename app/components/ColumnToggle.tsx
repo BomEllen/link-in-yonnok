@@ -20,7 +20,7 @@ export function ColumnToggle({
         aria-pressed={cols === 2}
         className={cx(
           "flex h-6 w-[30px] items-center justify-center rounded-segment-inner",
-          cols === 2 ? "bg-white text-brand" : "text-ink/30"
+          cols === 2 ? "bg-brand text-brand-ink" : "text-ink/30"
         )}
       >
         <Grid2x2 size={14} strokeWidth={2} />
@@ -32,7 +32,7 @@ export function ColumnToggle({
         aria-pressed={cols === 3}
         className={cx(
           "flex h-6 w-[34px] items-center justify-center rounded-segment-inner",
-          cols === 3 ? "bg-white text-brand" : "text-ink/30"
+          cols === 3 ? "bg-brand text-brand-ink" : "text-ink/30"
         )}
       >
         <Grid3x3 size={14} strokeWidth={2} />
